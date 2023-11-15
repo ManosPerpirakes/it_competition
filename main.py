@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QRadioButton, QPushButton, QLabel, QVBoxLayout, QHBoxLayout
+from PyQt6.QtWidgets import QApplication, QWidget, QRadioButton, QPushButton, QLabel, QVBoxLayout
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 from random import randint, shuffle
