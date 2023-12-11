@@ -33,9 +33,12 @@ def frb3(self):
 
 class Quiz(App):
     def build(self):
+        global scr2
         manager = ScreenManager()
-        manager.add_widget(Window1(name = "one"))
-        manager.add_widget(Window2(name = "two"))
+        scr1 = Window1(name = "one")
+        scr2 = Window2(name = "two")
+        manager.add_widget(scr1)
+        manager.add_widget(scr2)
         return manager
 
 class Window1(Screen):
@@ -88,6 +91,7 @@ class Window2(Screen):
             labeltext += answers_db[i]
             labeltext += "\n"
         self.label.text = labeltext
+        print(labeltext)
         self.label.bind(size = self.resize)        
         self.scroll = ScrollView(size_hint = (1, 1))
         self.scroll.add_widget(self.label)
@@ -123,6 +127,15 @@ class ScrBtn(Button):
         global w
         global correct_ans_index
         if len(keys) == 0:
+            scr2.label.text = "Τέλος του quiz!\nΠόντοι: " + str(points) + "\n\n"
+            labeltext = scr2.label.text
+            labeltext += "Οι ερωτήσεις με τις απαντήσεις:\n"
+            for i in answers_db:
+                labeltext += '\n'
+                labeltext += i + " "
+                labeltext += answers_db[i]
+                labeltext += "\n"
+            scr2.label.text = labeltext
             self.next()
         else:
             index = randint(0, len(keys)-1)
