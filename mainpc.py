@@ -1,13 +1,9 @@
+from PyQt6.QtWidgets import QApplication, QWidget, QRadioButton, QPushButton, QLabel, QVBoxLayout
+from PyQt6.QtGui import QFont
+from PyQt6.QtCore import Qt
 from random import randint, shuffle
-from kivy.app import App
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.label import Label
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.uix.togglebutton import ToggleButton
-from kivy.uix.scrollview import ScrollView
 
-def frb1(self):
+def frb1():
     global a1
     global a2
     global a3
@@ -15,7 +11,7 @@ def frb1(self):
     a2 = False
     a3 = False
 
-def frb2(self):
+def frb2():
     global a1
     global a2
     global a3
@@ -23,7 +19,7 @@ def frb2(self):
     a2 = True
     a3 = False
 
-def frb3(self):
+def frb3():
     global a1
     global a2
     global a3
@@ -31,115 +27,76 @@ def frb3(self):
     a2 = False
     a3 = True
 
-class Quiz(App):
-    def build(self):
-        manager = ScreenManager()
-        manager.add_widget(Window1(name = "one"))
-        manager.add_widget(Window2(name = "two"))
-        return manager
-
-class Window1(Screen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        global radiobuttons
-        global rb1
-        global rb2
-        global rb3
-        global l1
-        global correct_ans_index
-        l1 = Label(font_size = "8sp")
-        rb1 = ToggleButton(group = "group", font_size = "8sp")
-        rb1.bind(on_press = frb1)
-        rb2 = ToggleButton(group = "group", font_size = "8sp")
-        rb2.bind(on_press = frb2)
-        rb3 = ToggleButton(group = "group", font_size = "8sp")
-        rb3.bind(on_press = frb3)
-        pb1 = ScrBtn(self, "left", "two", text = "Υποβολή", font_size = "8sp")
-        lv1 = BoxLayout(orientation = "vertical")
-        lv1.add_widget(l1)
-        radiobuttons = [rb1, rb2, rb3]
-        for i in radiobuttons:
-            lv1.add_widget(i)
-        lv1.add_widget(pb1)
-        index = randint(0, len(keys)-1)
-        key = keys[index]
-        l1.text = key
-        shuffle(dictionary[key])
-        lcounter = 0
-        for i in dictionary[key]:
-            if len(i[0]) > 1:
-                radiobuttons[lcounter].text = i[0]
-                correct_ans_index = lcounter
-            else:
-                radiobuttons[lcounter].text = i
-            lcounter += 1
-        keys.remove(keys[index])
-        self.add_widget(lv1)
-
-class Window2(Screen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.label = Label(text = "Τέλος του quiz!\nΠόντοι: " + str(points) + "\n\n", size_hint_y = None, font_size = "24sp", halign = "left", valign = "top")
-        labeltext = self.label.text
+def show_q():
+    global keys
+    global w
+    global correct_ans_index
+    if len(keys) == 0:
+        w.hide()
+        w = QWidget()
+        w.resize(1000, 600)
+        w.setWindowTitle("Quiz")
+        label = QLabel("Τέλος του quiz!\nΠόντοι: " + str(points) + "\n\n")
+        labeltext = label.text()
         labeltext += "Οι ερωτήσεις με τις απαντήσεις:\n"
         for i in answers_db:
             labeltext += '\n'
             labeltext += i + " "
             labeltext += answers_db[i]
             labeltext += "\n"
-        self.label.text = labeltext
-        self.label.bind(size = self.resize)        
-        self.scroll = ScrollView(size_hint = (1, 1))
-        self.scroll.add_widget(self.label)
-        layout = BoxLayout(orientation = "vertical")
-        layout.add_widget(self.scroll)
-        self.add_widget(layout)
-    def resize(self, *args):
-        self.label.text_size = (self.label.width, None)
-        self.label.texture_update()
-        self.label.height = self.label.texture_size[1]
+        label.setText(labeltext)
+        layout = QVBoxLayout()
+        layout.addWidget(label, alignment = Qt.AlignmentFlag.AlignHCenter)
+        w.setLayout(layout)
+        w.show()
+    else:
+        index = randint(0, len(keys)-1)
+        key = keys[index]
+        l1.setText(key)
+        shuffle(dictionary[key])
+        lcounter = 0
+        for i in dictionary[key]:
+            if len(i[0]) > 1:
+                radiobuttons[lcounter].setText(i[0])
+                correct_ans_index = lcounter
+            else:
+                radiobuttons[lcounter].setText(i)
+            lcounter += 1
+        keys.remove(keys[index])
 
-class ScrBtn(Button):
-    def __init__(self, scrfrom, direction, scrto, **kwargs):
-        super().__init__(**kwargs)
-        self.scrfrom = scrfrom
-        self.direction = direction
-        self.scrto = scrto
-    def on_press(self):
-        global points
-        global correct_ans_index
-        if a1 and correct_ans_index == 0:
-            points += 1
-        elif a2 and correct_ans_index == 1:
-            points += 1
-        elif a3 and correct_ans_index == 2:
-            points += 1
-        self.show_q()
-    def next(self):
-        self.scrfrom.manager.transition.direction = self.direction
-        self.scrfrom.manager.current = self.scrto
-    def show_q(self):
-        global keys
-        global w
-        global correct_ans_index
-        if len(keys) == 0:
-            self.next()
-        else:
-            index = randint(0, len(keys)-1)
-            key = keys[index]
-            l1.text = key
-            shuffle(dictionary[key])
-            lcounter = 0
-            for i in dictionary[key]:
-                if len(i[0]) > 1:
-                    radiobuttons[lcounter].text = i[0]
-                    correct_ans_index = lcounter
-                else:
-                    radiobuttons[lcounter].text = i
-                lcounter += 1
-            keys.remove(keys[index])
+def nq():
+    global points
+    global correct_ans_index
+    if a1 and correct_ans_index == 0:
+        points += 1
+    elif a2 and correct_ans_index == 1:
+        points += 1
+    elif a3 and correct_ans_index == 2:
+        points += 1
+    show_q()
 
-
+app = QApplication([])
+w = QWidget()
+w.resize(1000, 600)
+w.setWindowTitle("Quiz")
+l1 = QLabel()
+l1.setFont(QFont('Arial', 15))
+rb1 = QRadioButton()
+rb1.setFont(QFont('Arial', 15))
+rb2 = QRadioButton()
+rb2.setFont(QFont('Arial', 15))
+rb3 = QRadioButton()
+rb3.setFont(QFont('Arial', 15))
+pb1 = QPushButton("Υποβολή")
+pb1.setFont(QFont('Arial', 15))
+lv1 = QVBoxLayout()
+lv1.addWidget(l1, alignment = Qt.AlignmentFlag.AlignHCenter)
+radiobuttons = [rb1, rb2, rb3]
+for i in radiobuttons:
+    lv1.addWidget(i, alignment = Qt.AlignmentFlag.AlignHCenter)
+lv1.addWidget(pb1, alignment = Qt.AlignmentFlag.AlignHCenter)
+w.setLayout(lv1)
+w.show()
 keys = [
     "Αν κάποιος δημοσιεύσει προσωπικά μου στοίχεια παρά τη θελήση μου\n (φωτογραφικό υλικό ή γραπτό μύνημα) πώς πρέπει να δράσω;",
     "Κάποιος γνωστός μου, μου στέλνει προσωπικά στοιχεία όπως τηλέφωνο\n, pin καρτών, κτλ πώς αντιδρώ;",
@@ -194,9 +151,13 @@ answers_db = {
     "Κάποιος σας στέλνει ένα ακατάλληλο βίντεο, τι κάνετε;": "Μπλοκ και αναφορά",
     "Αν κάποιος/α συμμαθητής/τρια σου έστελνε μια άσεμνη φωτογραφία\n στο κινητό σου τι θα έκανες;": "Θα την διέγραφα"
 }
+show_q()
 a1 = False
 a2 = False
 a3 = False
 points = 0
-app = Quiz()
-app.run()
+rb1.clicked.connect(frb1)
+rb2.clicked.connect(frb2)
+rb3.clicked.connect(frb3)
+pb1.clicked.connect(nq)
+app.exec()
